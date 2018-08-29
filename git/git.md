@@ -122,3 +122,59 @@ github给出的地址不止一个，上面走的ssh协议。默认的git://使�
 
 # 分支管理
 
+master：主分支，指向最新的提交
+
+HEAD：指向当前分支
+
+1. 创建分支并切换到分支：
+
+   ```git
+   $ git checkout -b <branch>
+   ```
+
+   git checkout 命令加上-b参数表示创建并切换，相当于一下两条命令：
+
+   ```git
+   $ git branch dev
+   $ git checkout dev
+   ```
+
+2. 查看当前分支
+
+   ```git
+   $ git branch
+   ```
+
+3. 在分支上完成工作，就可以切换回master分支：
+
+   ```git
+   $ git checkout master
+   ```
+
+   将dev分支的工作合并到master分支上：
+
+   ```git
+   $ git merge dev
+   ```
+
+   当合并完成后，就可以放心的删除dev分支了:
+
+   ```git
+   $ git branch -d dev
+   ```
+
+
+# 解决冲突
+
+当Git无法自动合并到分支时，就必须首先解决冲突。解决冲突，再提交。合并完成。
+
+解决冲突就是把Git合并失败的文件手动编辑为我们希望的内容，再提交。
+
+用 git log --graph 命令可以看到分支合并图
+
+例如：
+
+```git
+$ git log --graph --pretty=oneline --abbrev-commit
+```
+
