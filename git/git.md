@@ -178,3 +178,14 @@ HEAD：指向当前分支
 $ git log --graph --pretty=oneline --abbrev-commit
 ```
 
+# 分支管理策略
+
+通常，合并分支时，如果可能，Git会用Fast forward 模式，但是在这种模式下，删除分支后，会丢掉分支信息。如果要强制禁用Fast forward模式，Git就会在merge时生成一个新的commit，这样，从分支历史上就可以看出分支信息
+
+在合并的时候使用：
+
+```git
+$ git merge --no-ff -m "merge with no-ff" dev
+```
+
+一般来说在开发中，master都是非常稳定的。干活都在dev分支上，一般的合并向dev分支上合并，等稳定后向master上合并。
