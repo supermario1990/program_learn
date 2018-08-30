@@ -189,3 +189,164 @@ $ git merge --no-ff -m "merge with no-ff" dev
 ```
 
 一般来说在开发中，master都是非常稳定的。干活都在dev分支上，一般的合并向dev分支上合并，等稳定后向master上合并。
+
+# bug分支
+
+当前的dev分支正在进行开发，因为没有完成功能所以不能提交代码。但是发现了一个bug必须要在2小时内修复。这个时候：
+
+```git
+$ git stash
+```
+
+stash功能，可以把当前工作现场藏起来，等以后恢复现场后继续工作。
+
+1. 首先要确定在哪个分支上修复bug，如果要在master分支上修复，就从master上创建临时分支
+
+   ```git
+   $ git checkout master
+   $ git checkout -b issue-101
+   $ git add readme.txt  # 这一步修复bug
+   $ git checkout master
+   $ git merge --no-ff -m "merge bug fix 101" issue-101
+   ```
+
+2. 然后接着回到dev分支干活
+
+   ```git
+   $ git checkout dev
+   $ git stash list #查看工作现
+   ```
+
+3. 要恢复之前的工作现场
+
+   ```git
+   $ git stash apply # 恢复，但是恢复后stash内容并不删除
+   $ git stash drop # 删除stash内容
+   
+   # 另一种方式就是直接使用
+   $ git stash pop # 恢复的同时把stash的内容也删了
+   ```
+
+# feature分支
+
+添加一个新功能时，你肯定不希望以为一些实验性质的代码，把主分支搞乱了，所以每添加一个新功能，最好新建一个feature分支，在上面开发，合并，最后删除该feature分支
+
+例子：
+
+```git
+$ git checkout -b feature-vulcan
+$ git add vulcan.py
+$ git commit -m "add feature vulcan"
+$ git checkout dev # 切回到dev分支
+# 接到命令，新功能取消
+$ git branch -d feature-vulcan # 因为还没有被合并，所以这一步会失败
+
+#如果要强行删除
+$ git branch -D feature-vulcan
+
+```
+
+要强行丢弃一个没有被合并的分支，可以通过 git branch -D <name> 强行删除
+
+# 多人协作
+
+远程仓库的默认名称是origin
+
+1. 查看远程库信息：
+
+   ```git
+   $ git remote
+   $ git remote -v #显示更详细的信息
+   ```
+
+2. 推送分支
+
+   ```git
+   $ git push origin master
+   ```
+
+   如果要推送其他分支，比如dev：
+
+   ```git
+   $ git push origin dev
+   ```
+
+3. 是否推送分支？
+
+   - master分支时主分支，要时刻与远程同步
+   - dev分支时开发分支，也要与远程同步
+   - bug 可以在本地修复，不用推送
+   - feature 分支是否推送，取决于你是否和你的小伙伴在上面开发
+
+4. 抓取分支
+
+   模拟一个小伙伴：
+
+   ```git
+   $ git clone git@github.com:michaelliao/learngit.git # 从远程clone时，默认情况下只能看到本地的master分支
+   # 想在dev分支上开发，就必须创建远程origin的dev分支到本地
+   $ git checkout -b dev origin/dev # 这样就可以在dev上继续修改了
+   ```
+
+   模拟自己：
+
+   ```git
+   $ git add xxx.txt # 如果自己修改了文件
+   $ git push origin dev # 这一步会失败，以为别人推送了，和自己有冲突，要先git pull 到本地
+   $ git pull # 也会失败，没有指定本地dev和远程origin/dev分支的连接
+   $ git branch --set-upstream-to=origin/dev dev
+   $ git pull
+   # 可能会有冲突，那么手动解决冲突再提交
+   $ git commit -m "xxx"
+   ```
+# rebase
+[参考](http://gitbook.liuhui998.com/4_2.html)
+
+# 标签管理
+
+首先需要切换到打标签的分支上：
+
+```git
+$ git branch # 查看分支
+$ git checkout master # 切换到master分支
+$ git tag <tagname> # 打分支
+$ git tag # 查看分支
+$ git tag <tagname> <commit id>  # 对应某个commit id打tag
+$ git show <tagname> # 查看标签信息
+$ git tag -a <tagname> -m "commit msg" <commit id> # 创建带说面的标签
+```
+
+# 操作标签
+
+```git
+$ git tag -d v0.1 #如果标签打错了，可以删除
+$ git push origin <tagname> # 推送某个标签到远程
+$ git push origin --tags # 一次性推送全部尚未推送到远程的本地标签
+# 如果标签已经推送到远程，要删除远程标签就麻烦一点，先从本地删除
+$ git tag -d v0.9
+$ git push origin :refs/tags/v0.9
+```
+
+# 使用github
+
+先fork一下别人的仓库，然后从自己的仓库clone，再进行修改。如果希望别人能接受你的修改，推送一个pull request
+
+# 忽略特殊文件
+
+写 .gitignore 文件，并将此文件上传到仓库，进行版本管理
+
+```git
+$ git add -f <filename> # 有时候想添加一个文件，发现添加不了，原因就是这个文件被 .gitignore 文件忽略了,实在想添加就用 -f 
+$ git check-ignore -v <filename> # 如果觉得 .gitignore 文件写的有问题，就可以用这个命令检查
+```
+
+
+
+# 配置别名
+
+```git
+$ git config --global alias.st staus # status的别名是st
+```
+
+
+
